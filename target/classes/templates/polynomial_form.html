@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enter Polynomial</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Vibrant RGB Gradient Background */
+        body {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.7), rgba(255, 255, 0, 0.7), rgba(128, 0, 128, 0.7));
+            background-size: 400% 400%;  /* Smooth transitions */
+            animation: gradientAnimation 15s ease infinite;  /* Animates the gradient */
+            padding-top: 50px;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Form container with a solid background */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto; /* Center the form */
+            background-color: #ffffff; /* Solid white background */
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
+            padding: 30px; /* Inner padding */
+        }
+
+         /* Form Header Styling with a smooth RGB Gradient */
+        .form-header {
+            position: relative; /* Position for absolute overlay */
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5rem; /* Increased font size for better visibility */
+            z-index: 2; /* Ensure text is above overlay */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Adds a shadow to improve text visibility */
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.8), rgba(255, 215, 0, 0.8)); /* Orange to dark yellow */
+        }
+
+        /* Overlay effect for better text visibility */
+        .form-header::before {
+            content: ""; /* Necessary for pseudo-element */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2); /* White overlay with slight opacity */
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            z-index: 1; /* Ensure the overlay is behind the text */
+        }
+
+        /* Button styling - Navy Blue */
+        .btn-custom {
+            background-color: #001f3f; /* Navy blue button */
+            border: none;
+            border-radius: 5px; /* Rounded button corners */
+            color: white;
+        }
+
+        .btn-custom:hover {
+            background-color: #003366; /* Darker navy blue on hover */
+        }
+
+        /* Form footer for guidance text */
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: grey;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <h4 class="mb-0">Въведи полином</h4>
+    </div>
+
+    <div class="card-body">
+        <form action="#" th:action="@{/submit}" th:object="${polynomial}" method="post">
+            <!-- Polynomial Degree Input -->
+            <div class="form-group">
+                <label for="degree">Въведете степента на старшия коефициент:</label>
+                <input type="number" id="degree" class="form-control" th:field="*{degree}" min="0" onchange="generateCoefficientFields()" placeholder="Въведете степента на старшия коефициент" required/>
+            </div>
+
+            <!-- Coefficients Section -->
+            <div id="coefficients-container" class="form-group">
+                <!-- JavaScript will dynamically add coefficient inputs here -->
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-custom btn-block">Продължи</button>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- JavaScript to dynamically add input fields for coefficients -->
+<script>
+    function generateCoefficientFields() {
+        // Get the degree entered by the user
+        let degree = document.getElementById("degree").value;
+
+        // Get the container where we'll add the input fields
+        let container = document.getElementById("coefficients-container");
+
+        // Clear any existing coefficient fields
+        container.innerHTML = '';
+
+        // Generate input fields for each coefficient
+        for (let i = degree; i >= 0; i--) {
+            let div = document.createElement('div');
+            div.className = 'coefficient-input form-group';
+
+            let label = document.createElement('label');
+            label.innerHTML = "коефициент за x^" + i + ":";
+            div.appendChild(label);
+
+            let input = document.createElement('input');
+            input.type = 'number';
+            input.name = 'coefficients';
+            input.className = 'form-control';
+            input.required = true;
+            input.setAttribute('th:field', '*{coefficients[' + (degree - i) + ']}'); // For Thymeleaf binding
+            div.appendChild(input);
+
+            container.appendChild(div);
+        }
+    }
+</script>
+
+</body>
+</html>

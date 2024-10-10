@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Check Root</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Vibrant RGB Gradient Background */
+        body {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.7), rgba(255, 255, 0, 0.7), rgba(128, 0, 128, 0.7));
+            background-size: 400% 400%;  /* Smooth transitions */
+            animation: gradientAnimation 15s ease infinite;  /* Animates the gradient */
+            padding-top: 50px;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Form container with a solid background */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto; /* Center the form */
+            background-color: #ffffff; /* Solid white background */
+            border-radius: 20px; /* More rounded corners */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
+            padding: 30px; /* Inner padding */
+        }
+
+        /* Form Header Styling with a smooth RGB Gradient */
+        .form-header {
+            position: relative; /* Position for absolute overlay */
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 20px; /* Matching the container's radius */
+            border-top-right-radius: 20px; /* Matching the container's radius */
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5rem; /* Increased font size for better visibility */
+            z-index: 2; /* Ensure text is above overlay */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Adds a shadow to improve text visibility */
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.8), rgba(255, 215, 0, 0.8)); /* Orange to dark yellow */
+        }
+
+        /* Overlay effect for better text visibility */
+        .form-header::before {
+            content: ""; /* Necessary for pseudo-element */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2); /* White overlay with slight opacity */
+            border-top-left-radius: 20px; /* Matching the container's radius */
+            border-top-right-radius: 20px; /* Matching the container's radius */
+            z-index: 1; /* Ensure the overlay is behind the text */
+        }
+
+        /* Button styling - Navy Blue */
+        .btn-custom {
+            background-color: #001f3f; /* Navy blue button */
+            border: none;
+            border-radius: 5px; /* Rounded button corners */
+            color: white;
+        }
+
+        .btn-custom:hover {
+            background-color: #003366; /* Darker navy blue on hover */
+        }
+
+        /* Message styling */
+        .result-box {
+            font-size: 2rem; /* Larger font size for visibility */
+            font-weight: bold; /* Bold text */
+            text-align: center; /* Center text */
+            padding: 30px; /* Increased inner padding */
+            margin-top: 20px; /* Space above */
+            border-radius: 15px; /* Softer rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+        }
+
+        /* Specific styles for success and error messages */
+        .success {
+            color: #28a745; /* Green for success messages */
+            background-color: rgba(40, 167, 69, 0.2); /* Light green background */
+        }
+
+        .error {
+            color: #dc3545; /* Red for error messages */
+            background-color: rgba(220, 53, 69, 0.2); /* Light red background */
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <h4 class="mb-0">Проверка за корен на полинома</h4>
+    </div>
+
+    <div class="card-body">
+        <p th:text="'Степен: ' + ${polynomial.degree}"></p>
+        <p th:text="'Коефициенти: ' + ${polynomial.coefficients}"></p>
+
+        <form action="#" th:action="@{/check}" method="get">
+            <div class="form-group">
+                <label for="root">Въведете число:</label>
+                <input type="number" id="root" name="root" class="form-control" step="any" required/>
+            </div>
+            <input type="hidden" id="id" name="id" th:value="${polynomial.id}">
+            <button type="submit" class="btn btn-custom btn-block">Проверка на корен</button>
+        </form>
+        <br>
+        <form action="#" th:action="@{/roots}" method="get">
+            <input type="hidden" id="polinomId" name="id" th:value="${polynomial.id}">
+            <button type="submit" class="btn btn-custom btn-block">Намери корените</button>
+        </form>
+        <br>
+        <form action="#" th:action="@{/}" method="get">
+            <button type="submit" class="btn btn-custom btn-block">Въведете нов полином</button>
+        </form>
+        <br>
+        <!-- Display message here -->
+        <div class="result-box" th:class="${messageType}" th:text="${message}"></div>
+    </div>
+
+    <div class="form-footer">
+        <!-- Any additional footer content can go here -->
+    </div>
+</div>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
