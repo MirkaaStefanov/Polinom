@@ -16,7 +16,7 @@ public class Polinom {
     private Long id;
 
     private int degree;
-    private List<Integer> coefficients;
+    private List<Double> coefficients;
 
     public Long getId() {
         return id;
@@ -34,11 +34,11 @@ public class Polinom {
         this.degree = degree;
     }
 
-    public List<Integer> getCoefficients() {
+    public List<Double> getCoefficients() {
         return coefficients;
     }
 
-    public void setCoefficients(List<Integer> coefficients) {
+    public void setCoefficients(List<Double> coefficients) {
         this.coefficients = coefficients;
     }
 }

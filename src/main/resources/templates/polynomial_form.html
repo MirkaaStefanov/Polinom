@@ -89,7 +89,7 @@
     </div>
 
     <div class="card-body">
-        <form action="#" th:action="@{/submit}" th:object="${polynomial}" method="post">
+        <form id="polynomialForm" action="#" th:action="@{/submit}" th:object="${polynomial}" method="post" onsubmit="return validateAndSubmit();">
             <!-- Polynomial Degree Input -->
             <div class="form-group">
                 <label for="degree">Въведете степента на старшия коефициент:</label>
@@ -108,7 +108,7 @@
 </div>
 
 <!-- Bootstrap JS, Popper.js, and jQuery -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
@@ -134,15 +134,47 @@
             div.appendChild(label);
 
             let input = document.createElement('input');
-            input.type = 'number';
+            input.type = 'text';  // Change type to text to allow fractions
             input.name = 'coefficients';
             input.className = 'form-control';
             input.required = true;
             input.setAttribute('th:field', '*{coefficients[' + (degree - i) + ']}'); // For Thymeleaf binding
-            div.appendChild(input);
 
+            div.appendChild(input);
             container.appendChild(div);
         }
+    }
+
+    function validateAndSubmit() {
+        const inputs = document.querySelectorAll('.coefficient-input input');
+        let allValid = true;
+
+        inputs.forEach(input => {
+            const value = input.value;
+
+            // Check if the input is a fraction
+            const fractionRegex = /^-?\d+\/-?\d+$/;
+            if (fractionRegex.test(value)) {
+                const [numerator, denominator] = value.split('/').map(Number);
+
+                // Check if denominator is not zero
+                if (denominator === 0) {
+                    alert("Знаменателят не може да бъде 0 в " + value);
+                    allValid = false;
+                    return;
+                }
+
+                // Convert fraction to decimal
+                const decimalValue = (numerator / denominator).toFixed(2); // Convert fraction to decimal
+                input.value = decimalValue; // Set the input value to the decimal
+            } else if (isNaN(value) || value.trim() === "") {
+                alert("Моля, въведете валидно число или дроб!");
+                allValid = false;
+                return;
+            }
+        });
+
+        return allValid; // If all inputs are valid, allow the form to be submitted
     }
 </script>
 

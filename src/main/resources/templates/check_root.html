@@ -108,10 +108,10 @@
         <p th:text="'Степен: ' + ${polynomial.degree}"></p>
         <p th:text="'Коефициенти: ' + ${polynomial.coefficients}"></p>
 
-        <form action="#" th:action="@{/check}" method="get">
+        <form action="#" th:action="@{/check}" method="get" onsubmit="return validateInput();">
             <div class="form-group">
                 <label for="root">Въведете число:</label>
-                <input type="number" id="root" name="root" class="form-control" step="any" required/>
+                <input type="text" id="root" name="root" class="form-control" required/>
             </div>
             <input type="hidden" id="id" name="id" th:value="${polynomial.id}">
             <button type="submit" class="btn btn-custom btn-block">Проверка на корен</button>
@@ -139,6 +139,46 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Function to validate and convert input
+    function validateInput() {
+        const input = document.getElementById('root').value.trim();
+
+        // Regex patterns for fraction, root and negative root
+        const fractionRegex = /^-?\d+\/-?\d+$/;
+        const rootRegex = /^-?√\d+$/;
+
+        let number;
+
+        if (fractionRegex.test(input)) {
+            // If input is a fraction, convert it to decimal
+            const [numerator, denominator] = input.split('/').map(Number);
+            if (denominator === 0) {
+                alert("Знаменателят не може да бъде 0.");
+                return false;
+            }
+            number = (numerator / denominator).toFixed(10); // Convert to decimal with 10 decimal places
+        } else if (rootRegex.test(input)) {
+            // If input is a square root, convert to decimal
+            const radicand = parseInt(input.slice(1)); // Get the number under the root
+            number = Math.sqrt(radicand).toFixed(10); // Calculate square root
+            if (input.startsWith('-')) {
+                number = (-1 * Math.sqrt(radicand)).toFixed(10); // Calculate negative square root
+            }
+        } else if (isNaN(input) || input === "") {
+            alert("Моля, въведете валидно число или дроб!");
+            return false;
+        } else {
+            number = Number(input).toFixed(10); // Assume it's a valid number and convert
+        }
+
+        // Optionally set the converted number back to the input field if needed
+        document.getElementById('root').value = number;
+
+        return true; // Allow the form to be submitted
+    }
+</script>
 
 </body>
 </html>

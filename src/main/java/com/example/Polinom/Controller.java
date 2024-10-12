@@ -30,22 +30,21 @@ public class Controller {
         return "check_root";
     }
 
-
     @GetMapping("/check")
     public String checkRoot(@RequestParam Long id, @RequestParam double root, Model model) {
         Polinom polynomial = polynomialRepository.findById(id).orElse(null);
+        List<Double> polinomCoef = polynomial.getCoefficients();
 
-        double result = polinomService.ifRoot(polynomial, root);
+        double result = polinomService.ifRoot(polinomCoef, root).get(polinomService.ifRoot(polinomCoef, root).size()-1);
 
         model.addAttribute("polynomial", polynomial);
 
-        // Set the message and its type based on the result
         if (result == 0) {
             model.addAttribute("message", "Числото " + root + " е корен на полинома.");
-            model.addAttribute("messageType", "success"); // Indicate success for styling
+            model.addAttribute("messageType", "success");
         } else {
             model.addAttribute("message", "Числото " + root + " не е корен на полинома. Остатък: " + result);
-            model.addAttribute("messageType", "error"); // Indicate error for styling
+            model.addAttribute("messageType", "error");
         }
 
         return "check_root";
@@ -55,14 +54,13 @@ public class Controller {
     public String showRoots(@RequestParam Long id, Model model) {
         Polinom polynomial = polynomialRepository.findById(id).orElse(null);
         if (polynomial != null) {
-            List<Double> roots = polinomService.theRoots(polynomial);
+            List<String> roots = polinomService.theRoots(polynomial.getCoefficients());
             model.addAttribute("polynomial", polynomial);
             model.addAttribute("roots", roots);
         } else {
-            model.addAttribute("message", "Polynomial not found.");
+            model.addAttribute("message", "Полиномът не е намерен.");
             model.addAttribute("messageType", "error");
         }
         return "roots";
     }
-
 }
