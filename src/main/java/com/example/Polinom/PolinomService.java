@@ -66,23 +66,36 @@ public class PolinomService {
         double a = polinomCoef.get(0);
         double b = polinomCoef.get(1);
         double c = polinomCoef.get(2);
+
         // Изчисляване на дискриминантата
         double D = b * b - 4 * a * c;
+
         if (D > 0) {
-            // Дискриминантата е положителна: два реални корена (включително ирационални)
-            double sqrtD = Math.sqrt(D);
-            double x1 = (-b + sqrtD) / (2 * a);
-            double x2 = (-b - sqrtD) / (2 * a);
-            koreni.add(formatRoot(x1));
-            koreni.add(formatRoot(x2));
+            // Дискриминантата е положителна: два реални корена
+            if (isPerfectSquare(D)) {
+                // Ако дискриминантата е перфектен квадрат, изчисляваме корените като обикновени числа
+                double sqrtD = Math.sqrt(D);
+                double x1 = (-b + sqrtD) / (2 * a);
+                double x2 = (-b - sqrtD) / (2 * a);
+                koreni.add(formatRoot(x1));
+                koreni.add(formatRoot(x2));
+            } else {
+                // Ако дискриминантата не е перфектен квадрат, връщаме корените във формата (b ± √D)/(2a)
+                String root1 = String.format("(%d + √%.0f)/%.0f", (int) -b, D, 2 * a);
+                String root2 = String.format("(%d - √%.0f)/%.0f", (int) -b, D, 2 * a);
+                koreni.add(root1);
+                koreni.add(root2);
+            }
         } else if (D == 0) {
+            // Един двоен корен
             double x = -b / (2 * a);
             koreni.add(formatRoot(x));
             koreni.add(formatRoot(x));
         } else {
-            // Дискриминантата е отрицателна: няма реални корени, има комплексни корени
-            koreni.add("unreal"); // добавяме само реалната част
+            // Дискриминантата е отрицателна: няма реални корени
+            koreni.add("unreal");
         }
+
         return koreni;
     }
 
