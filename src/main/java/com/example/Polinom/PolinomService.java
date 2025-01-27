@@ -8,14 +8,13 @@ import java.util.List;
 @Service
 public class PolinomService {
 
-
+    // Метод за форматиране на корен
     public String formatRoot(double chislo) {
         StringBuilder result = new StringBuilder();
         double absChislo = Math.abs(chislo);
 
-
         if (chislo % 1 == 0) {
-          result.append((int)chislo);
+            result.append((int) chislo);
         } else if (isPerfectSquare(absChislo)) { // Ако може да се представи като корен
             if (chislo < 0) {
                 result.append("-√").append((int) absChislo);
@@ -99,7 +98,6 @@ public class PolinomService {
         return koreni;
     }
 
-
     // Метод за проверка дали число е корен на полином
     public List<Double> ifRoot(List<Double> polinomCoef, double root) {
         List<Double> coefficients = polinomCoef;
@@ -146,30 +144,110 @@ public class PolinomService {
         return koreni;
     }
 
-    public List<String> theRoots(List<Double> polinomCoef) {
-        List<Double> possibleRoots = findPossibleRoots(polinomCoef);
-        List<String> koreni = new ArrayList<>();
-
-        if (polinomCoef.size() == 3) {
-            return uravnenieSDiskriminanta(polinomCoef);
+    // Метод за проверка дали полиномът е реципрочен
+    private boolean isReciprocal(List<Double> polinomCoef) {
+        int n = polinomCoef.size();
+        for (int i = 0; i < n / 2; i++) {
+            if (!polinomCoef.get(i).equals(polinomCoef.get(n - 1 - i))) {
+                return false;
+            }
         }
-        for (int i = 0; i < possibleRoots.size(); i++) {
-            List<Double> updatedCoef = ifRoot(polinomCoef, possibleRoots.get(i));
-            int size = updatedCoef.size();
-            double result = updatedCoef.get(size - 1);
-            if (result == 0) {
-                koreni.add(simplifyFraction(possibleRoots.get(i)));
+        return true;
+    }
 
-                polinomCoef = updatedCoef.subList(0, size - 1);
-                i = -1;
-                if (polinomCoef.size() == 3) {
 
-                    koreni.addAll(uravnenieSDiskriminanta(polinomCoef));
-                    break;
+    public List<String> solveReciprocalPolynomial(List<Double> polinomCoef) {
+        List<String> roots = new ArrayList<>();
+        int n = polinomCoef.size() - 1; // Степен на полинома
+
+        // Проверка за нечетна степен
+        if (n % 2 != 0) {
+            // При нечетна степен, -1 винаги е корен
+            roots.add("-1");
+            // Разделяме полинома на (x + 1) с помощта на ifRoot
+            List<Double> newCoef = ifRoot(polinomCoef, -1.0);
+            // Премахваме последния елемент (остатъка), тъй като той трябва да е 0
+            newCoef = newCoef.subList(0, newCoef.size() - 1);
+            // Рекурсивно решаваме новия полином (вече с четна степен)
+            roots.addAll(solveReciprocalPolynomial(newCoef));
+        } else {
+            // При четна степен, използваме заместването y = x + 1/x
+            List<Double> yCoef = getYPolynomial(polinomCoef);
+            // Решаваме уравнението за y
+            List<String> yRoots = uravnenieSDiskriminanta(yCoef);
+
+            // Връщаме се към x
+            for (String yRoot : yRoots) {
+                if (!yRoot.equals("unreal")) {
+                    // Ако коренът е символен израз (например "(-6 + √8)/2"), го добавяме директно
+                    if (yRoot.contains("√") || yRoot.contains("/")) {
+                        roots.add(yRoot); // Добавяме символните корени директно
+                    } else {
+                        // Ако коренът е число, решаваме уравнението x + 1/x = y
+                        double y = Double.parseDouble(yRoot);
+                        List<Double> xCoef = new ArrayList<>();
+                        xCoef.add(1.0);
+                        xCoef.add(-y);
+                        xCoef.add(1.0);
+                        roots.addAll(uravnenieSDiskriminanta(xCoef));
+                    }
                 }
             }
         }
-        return koreni;
+
+        return roots;
     }
 
+    // Метод за получаване на полинома за y = x + 1/x
+    private List<Double> getYPolynomial(List<Double> polinomCoef) {
+        int n = polinomCoef.size() - 1; // Степен на полинома
+        int m = n / 2; // Степен на новия полином за y
+        List<Double> yCoef = new ArrayList<>();
+
+        // Инициализираме коефициентите за y
+        for (int i = 0; i <= m; i++) {
+            yCoef.add(polinomCoef.get(i));
+        }
+
+        // Прилагаме рекурентната формула за преобразуване
+        for (int k = 1; k <= m; k++) {
+            for (int i = m; i >= k; i--) {
+                yCoef.set(i, yCoef.get(i) - yCoef.get(i - 1));
+            }
+        }
+
+        return yCoef;
+    }
+
+
+    // Основен метод за намиране на корените
+    public List<String> theRoots(List<Double> polinomCoef) {
+        if (isReciprocal(polinomCoef)) {
+            return solveReciprocalPolynomial(polinomCoef);
+        } else {
+            List<Double> possibleRoots = findPossibleRoots(polinomCoef);
+            List<String> koreni = new ArrayList<>();
+
+            if (polinomCoef.size() == 3) {
+                return uravnenieSDiskriminanta(polinomCoef);
+            }
+            for (int i = 0; i < possibleRoots.size(); i++) {
+                List<Double> updatedCoef = ifRoot(polinomCoef, possibleRoots.get(i));
+                int size = updatedCoef.size();
+                double result = updatedCoef.get(size - 1);
+                if (result == 0) {
+                    koreni.add(simplifyFraction(possibleRoots.get(i)));
+
+                    polinomCoef = updatedCoef.subList(0, size - 1);
+                    i = -1;
+                    if (polinomCoef.size() == 3) {
+
+                        koreni.addAll(uravnenieSDiskriminanta(polinomCoef));
+                        break;
+                    }
+                }
+            }
+            return koreni;
+        }
+    }
 }
